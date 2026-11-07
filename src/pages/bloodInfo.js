@@ -1,6 +1,7 @@
 import { BLOOD_TYPES, COMPATIBILITY } from "../data/bloodCompatibility.js";
 import { icon } from "../utils/icons.js";
 import { cardClass } from "../utils/styles.js";
+import { expand, collapse, staggerChildren } from "../utils/motion.js";
 
 const eligibility = [
   "Generally aged 18–65 (rules vary by blood service)",
@@ -84,11 +85,15 @@ export default function bloodInfo(container) {
       </section>
     </div>
   `;
+  staggerChildren(container.querySelector(".mx-auto"), "section");
 
   container.querySelectorAll("[data-faq]").forEach((btn) =>
     btn.addEventListener("click", () => {
-      btn.nextElementSibling.classList.toggle("hidden");
-      btn.lastElementChild.classList.toggle("rotate-180");
+      const answer = btn.nextElementSibling;
+      const isOpen = !answer.classList.contains("hidden");
+      if (isOpen) collapse(answer);
+      else expand(answer);
+      btn.lastElementChild.classList.toggle("rotate-180", !isOpen);
     })
   );
 }

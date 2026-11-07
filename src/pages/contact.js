@@ -2,6 +2,7 @@ import { createMessage } from "../services/messages.js";
 import { required, isEmail, minLength } from "../utils/validation.js";
 import { icon } from "../utils/icons.js";
 import { btnPrimary, cardClass, inputClass } from "../utils/styles.js";
+import { fadeIn, setButtonLoading, shake, spinner } from "../utils/motion.js";
 
 export default function contact(container) {
   container.innerHTML = `
@@ -41,16 +42,25 @@ export default function contact(container) {
     status.className = "text-sm text-primary";
     if (errors.length) {
       status.textContent = errors.join(" ");
+      fadeIn(status, { y: 4, duration: 180 });
+      shake(status);
       return;
     }
 
     try {
+      const submitButton = form.querySelector("button[type='submit']");
+      setButtonLoading(submitButton, true, spinner(icon("Mail", { width: 16, height: 16 })));
       await createMessage(data);
       form.reset();
       status.className = "text-sm text-secondary";
       status.textContent = "Thanks! Your message was sent.";
+      fadeIn(status, { y: 4, duration: 180 });
     } catch (err) {
       status.textContent = err.message;
+      fadeIn(status, { y: 4, duration: 180 });
+      shake(status);
+    } finally {
+      setButtonLoading(form.querySelector("button[type='submit']"), false);
     }
   });
 }

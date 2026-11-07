@@ -5,6 +5,7 @@ import { passwordField, initPasswordToggles } from "../components/passwordField.
 import { passwordsMatch } from "../utils/validation.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
 import { icon } from "../utils/icons.js";
+import { fadeIn, setButtonLoading, shake, spinner } from "../utils/motion.js";
 
 export default function hospitalRegister(container) {
   container.innerHTML = `
@@ -53,10 +54,16 @@ export default function hospitalRegister(container) {
     }
 
     try {
+      const submitButton = form.querySelector("button[type='submit']");
+      setButtonLoading(submitButton, true, spinner(icon("Plus", { width: 16, height: 16 })));
       await registerHospital(data);
       navigate("/hospital-dashboard");
     } catch (err) {
       errorMsg.textContent = err.message;
+      fadeIn(errorMsg, { y: 4, duration: 180 });
+      shake(errorMsg);
+    } finally {
+      setButtonLoading(form.querySelector("button[type='submit']"), false);
     }
   });
 }

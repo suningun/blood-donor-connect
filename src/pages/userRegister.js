@@ -5,6 +5,7 @@ import { passwordField, initPasswordToggles } from "../components/passwordField.
 import { passwordsMatch } from "../utils/validation.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
 import { icon } from "../utils/icons.js";
+import { fadeIn, setButtonLoading, shake, spinner } from "../utils/motion.js";
 
 export default function userRegister(container) {
   container.innerHTML = `
@@ -53,10 +54,16 @@ export default function userRegister(container) {
     }
 
     try {
+      const submitButton = form.querySelector("button[type='submit']");
+      setButtonLoading(submitButton, true, spinner(icon("UserPlus", { width: 16, height: 16 })));
       await registerUser(data);
       navigate("/posts");
     } catch (err) {
       errorMsg.textContent = err.message;
+      fadeIn(errorMsg, { y: 4, duration: 180 });
+      shake(errorMsg);
+    } finally {
+      setButtonLoading(form.querySelector("button[type='submit']"), false);
     }
   });
 }

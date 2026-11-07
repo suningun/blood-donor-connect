@@ -3,6 +3,7 @@ import { postCard } from "../components/postCard.js";
 import { icon } from "../utils/icons.js";
 import { PROVINCES } from "../data/provinces.js";
 import { cardClass, inputClass, selectClass, skeletonClass } from "../utils/styles.js";
+import { fadeIn, fadeSwap, staggerChildren } from "../utils/motion.js";
 
 export default async function postsList(container) {
   container.innerHTML = `<div class="mx-auto max-w-6xl space-y-4 p-6"><div class="${skeletonClass} h-10 w-64"></div><div class="${skeletonClass} h-12"></div><div class="grid gap-4 md:grid-cols-3"><div class="${skeletonClass} h-44"></div><div class="${skeletonClass} h-44"></div><div class="${skeletonClass} h-44"></div></div></div>`;
@@ -19,8 +20,11 @@ export default async function postsList(container) {
   const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   const renderList = (list) => {
-    container.querySelector("#list").innerHTML =
-      list.length ? list.map(postCard).join("") : `<p class="text-neutral/50">No requests found.</p>`;
+    const listElement = container.querySelector("#list");
+    fadeSwap(listElement, () => {
+      listElement.innerHTML = list.length ? list.map(postCard).join("") : `<p class="text-neutral/50">No requests found.</p>`;
+      staggerChildren(listElement);
+    });
   };
 
   container.innerHTML = `
@@ -50,6 +54,7 @@ export default async function postsList(container) {
   `;
 
   renderList(posts);
+  fadeIn(container.querySelector(".mx-auto"), { y: 8 });
 
   container.querySelector("#provinceFilter").addEventListener("change", applyFilters);
   container.querySelector("#bloodFilter").addEventListener("change", applyFilters);

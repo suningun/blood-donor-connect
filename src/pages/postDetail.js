@@ -3,13 +3,14 @@ import { registerToPost, getRegistrantsByPost } from "../services/registrations.
 import { registrantList } from "../components/registrantList.js";
 import { icon } from "../utils/icons.js";
 import { btnPrimary, cardClass, chipClass, inputClass, selectClass } from "../utils/styles.js";
+import { fadeIn, setButtonLoading, shake, spinner, staggerChildren } from "../utils/motion.js";
 
 export default async function postDetail(container, postId) {
   const idToken = localStorage.getItem("idToken");
   const uid = localStorage.getItem("uid");
   const role = localStorage.getItem("role");
 
-  container.innerHTML = `<p class="p-6 text-neutral/60">Loading...</p>`;
+  container.innerHTML = `<div class="mx-auto max-w-2xl space-y-4 p-6"><div class="h-48 animate-pulse rounded-2xl bg-neutral/10"></div><div class="h-64 animate-pulse rounded-2xl bg-neutral/10"></div></div>`;
 
   let post;
   try {
@@ -39,16 +40,18 @@ export default async function postDetail(container, postId) {
   `;
 
   const section = container.querySelector("#registerSection");
+  fadeIn(container.querySelector("div.mx-auto"), { y: 8 });
 
   // Hospital that owns this post: sees registrants
   if (isHospitalOwner) {
     section.innerHTML = `
       <h2 class="mb-3 flex items-center gap-1 font-headline font-semibold text-neutral">${icon("User")} Registrants</h2>
-      <div id="registrants"><p class="text-sm text-neutral/50">Loading...</p></div>
+      <div id="registrants"><div class="h-20 animate-pulse rounded-2xl bg-neutral/10"></div></div>
     `;
     try {
       const regs = await getRegistrantsByPost(postId, uid, idToken);
       section.querySelector("#registrants").innerHTML = registrantList(regs);
+      staggerChildren(section.querySelector("#registrants"));
     } catch (err) {
       section.querySelector("#registrants").innerHTML = `<p class="text-sm text-primary">${err.message}</p>`;
     }
@@ -112,6 +115,8 @@ export default async function postDetail(container, postId) {
     successMsg.textContent = "";
 
     const data = Object.fromEntries(new FormData(form));
+    const submitButton = form.querySelector("button[type='submit']");
+    setButtonLoading(submitButton, true, spinner(icon("Droplet", { width: 16, height: 16 })));
     try {
       await registerToPost(
         {
@@ -125,9 +130,14 @@ export default async function postDetail(container, postId) {
         idToken
       );
       successMsg.textContent = "Successfully registered!";
+      fadeIn(successMsg, { y: 4, duration: 180 });
       form.reset();
     } catch (err) {
       errorMsg.textContent = err.message;
+      fadeIn(errorMsg, { y: 4, duration: 180 });
+      shake(errorMsg);
+    } finally {
+      setButtonLoading(submitButton, false);
     }
   });
 }

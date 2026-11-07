@@ -2,6 +2,7 @@ import { getPosts } from "../services/posts.js";
 import { postCard } from "../components/postCard.js";
 import { icon } from "../utils/icons.js";
 import { btnOutline, btnPrimary, cardClass, skeletonClass } from "../utils/styles.js";
+import { fadeIn, staggerChildren } from "../utils/motion.js";
 
 const steps = [
   { icon: "UserPlus", title: "Sign up", text: "Create a free donor account in under a minute." },
@@ -56,6 +57,7 @@ export default async function home(container) {
       </div>
     </section>
   `;
+  staggerChildren(container.querySelector("main") || container, "section");
 
   try {
     const active = (await getPosts()).filter((p) => p.status === "active");
@@ -63,6 +65,8 @@ export default async function home(container) {
     container.querySelector("#latest").innerHTML = active.length
       ? active.slice(0, 3).map(postCard).join("")
       : `<p class="text-neutral/50">No active requests yet.</p>`;
+    staggerChildren(container.querySelector("#latest"));
+    fadeIn(container.querySelector("#stat"), { y: 4, duration: 180 });
   } catch (err) {
     container.querySelector("#latest").innerHTML = `<p class="text-primary">${err.message}</p>`;
   }

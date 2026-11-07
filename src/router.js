@@ -1,5 +1,6 @@
 import { renderHeader } from "./components/header.js";
 import { renderFooter } from "./components/footer.js";
+import { fadeIn, fadeOut } from "./utils/motion.js";
 
 const routes = {
   "/": () => import("./pages/home.js"),
@@ -34,13 +35,16 @@ export const render = async (path) => {
   renderFooter(document.getElementById("footer"));
 
   const app = document.getElementById("app");
+  await fadeOut(app);
   app.innerHTML = "";
 
   if (path.startsWith("/post/")) {
     const { default: postDetail } = await import("./pages/postDetail.js");
-    return postDetail(app, path.split("/post/")[1]);
+    await postDetail(app, path.split("/post/")[1]);
+    return fadeIn(app, { y: 8, duration: 250 });
   }
 
   const { default: page } = await (routes[path] ?? routes["/"])();
   page(app);
+  return fadeIn(app, { y: 8, duration: 250 });
 };

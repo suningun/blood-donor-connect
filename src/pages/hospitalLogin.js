@@ -1,6 +1,8 @@
 import { loginHospital } from "../auth/hospitalAuth.js";
 import { navigate } from "../router.js";
 import { btnPrimary, cardClass, inputClass } from "../utils/styles.js";
+import { fadeIn, setButtonLoading, shake, spinner } from "../utils/motion.js";
+import { icon } from "../utils/icons.js";
 
 export default function hospitalLogin(container) {
   container.innerHTML = `
@@ -32,11 +34,17 @@ export default function hospitalLogin(container) {
     e.preventDefault();
     errorMsg.textContent = "";
     const data = Object.fromEntries(new FormData(form));
+    const submitButton = form.querySelector("button[type='submit']");
+    setButtonLoading(submitButton, true, spinner(icon("LogIn", { width: 16, height: 16 })));
     try {
       await loginHospital(data);
       navigate("/hospital-dashboard");
     } catch (err) {
       errorMsg.textContent = err.message;
+      fadeIn(errorMsg, { y: 4, duration: 180 });
+      shake(errorMsg);
+    } finally {
+      setButtonLoading(submitButton, false);
     }
   });
 }

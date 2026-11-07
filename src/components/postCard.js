@@ -2,7 +2,7 @@ import { icon } from "../utils/icons.js";
 import { cardClass, chipClass } from "../utils/styles.js";
 
 export const postCard = (post) => `
-    <article class="${cardClass} group p-5 transition duration-150 hover:-translate-y-1 hover:shadow-lg">
+    <article class="${cardClass} group p-5 transition duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
         <div class="flex items-start justify-between gap-3">
         <div class="flex min-w-0 items-center gap-3">
           <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-headline text-lg font-bold text-primary">${post.bloodType}</div>

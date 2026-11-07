@@ -4,6 +4,7 @@ import { getRegistrantsByPost } from "../services/registrations.js";
 import { PROVINCES } from "../data/provinces.js";
 import { icon } from "../utils/icons.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
+import { fadeIn, fadeOut, setButtonLoading, spinner, staggerChildren } from "../utils/motion.js";
 
 
 export default async function hospitalDashboard(container) {
@@ -75,10 +76,13 @@ export default async function hospitalDashboard(container) {
         <div data-registrants="${p.id}" class="hidden mt-2 text-sm text-neutral/70"></div>
       </div>
     `).join("");
+    staggerChildren(postList);
 
     postList.querySelectorAll("[data-view]").forEach((btn) =>
       btn.addEventListener("click", async () => {
         const postId = btn.dataset.view;
+        const originalLabel = btn.innerHTML;
+        setButtonLoading(btn, true, spinner(icon("User", { width: 16, height: 16 })));
         const regs = await getRegistrantsByPost(postId, uid, idToken);
         const box = postList.querySelector(`[data-registrants="${postId}"]`);
         
@@ -86,11 +90,15 @@ export default async function hospitalDashboard(container) {
         box.innerHTML = regs.length
           ? regs.map((r) => `<p>${r.name} — ${r.phone} — ${r.gender}, ${r.age}y</p>`).join("")
           : `<p>No registrants yet.</p>`;
+        btn.innerHTML = originalLabel;
+        setButtonLoading(btn, false);
+        fadeIn(box, { y: 4, duration: 180 });
       })
     );
 
     postList.querySelectorAll("[data-close]").forEach((btn) =>
       btn.addEventListener("click", async () => {
+        setButtonLoading(btn, true, spinner(icon("Pencil", { width: 16, height: 16 })));
         await updatePost(btn.dataset.close, { status: "fulfilled" }, idToken);
         loadPosts();
       })
@@ -98,7 +106,10 @@ export default async function hospitalDashboard(container) {
 
     postList.querySelectorAll("[data-delete]").forEach((btn) =>
       btn.addEventListener("click", async () => {
+        const card = btn.parentElement?.parentElement;
+        setButtonLoading(btn, true, spinner(icon("Trash2", { width: 16, height: 16 })));
         await deletePost(btn.dataset.delete, idToken);
+        await fadeOut(card, { duration: 180 });
         loadPosts();
       })
     );
@@ -107,9 +118,15 @@ export default async function hospitalDashboard(container) {
   container.querySelector("#createForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
-    await createPost({ ...data, unitsNeeded: Number(data.unitsNeeded), hospitalId: uid, hospitalName: "Hospital" }, idToken);
-    e.target.reset();
-    loadPosts();
+    const submitButton = e.target.querySelector("button[type='submit']");
+    setButtonLoading(submitButton, true, spinner(icon("Plus", { width: 16, height: 16 })));
+    try {
+      await createPost({ ...data, unitsNeeded: Number(data.unitsNeeded), hospitalId: uid, hospitalName: "Hospital" }, idToken);
+      e.target.reset();
+      loadPosts();
+    } finally {
+      setButtonLoading(submitButton, false);
+    }
   });
 
   loadPosts();
