@@ -1,25 +1,24 @@
 import { createMessage } from "../services/messages.js";
 import { required, isEmail, minLength } from "../utils/validation.js";
 import { icon } from "../utils/icons.js";
-
-const inputClass = "w-full border border-neutral/20 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40";
+import { btnPrimary, cardClass, inputClass } from "../utils/styles.js";
 
 export default function contact(container) {
   container.innerHTML = `
-    <div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <h1 class="font-headline text-3xl font-bold text-neutral">Contact Us</h1>
       <p class="text-neutral/70 mt-2">Questions or feedback? Send us a message.</p>
 
       <div class="grid md:grid-cols-2 gap-6 mt-6">
-        <form id="contactForm" novalidate class="bg-white border border-neutral/15 rounded-lg p-5 space-y-3">
+        <form id="contactForm" novalidate class="${cardClass} space-y-3 p-5">
           <input name="name" placeholder="Your name" class="${inputClass}" />
           <input name="email" type="email" placeholder="Email" class="${inputClass}" />
           <textarea name="message" rows="5" placeholder="Message" class="${inputClass}"></textarea>
-          <button type="submit" class="w-full bg-primary text-white font-medium py-2 rounded-md">Send Message</button>
+          <button type="submit" class="${btnPrimary} w-full">Send Message</button>
           <p id="status" class="text-sm"></p>
         </form>
 
-        <div class="bg-white border border-neutral/15 rounded-lg p-5 space-y-4 text-sm">
+        <div class="${cardClass} space-y-4 p-5 text-sm">
           <p class="flex items-center gap-2">${icon("Mail", { color: "#854F0B" })} hello@blooddonorconnect.example</p>
           <p class="flex items-center gap-2">${icon("Phone", { color: "#854F0B" })} 023 000 000 (placeholder)</p>
           <p class="flex items-center gap-2">${icon("MapPin", { color: "#854F0B" })} Phnom Penh, Cambodia</p>

@@ -1,5 +1,7 @@
 import { getPosts } from "../services/posts.js";
 import { postCard } from "./postCard.js";
+import { icon } from "../utils/icons.js";
+import { selectClass } from "../utils/styles.js";
 
 export default async function postsList(container) {
   const idToken = localStorage.getItem("idToken");
@@ -30,14 +32,20 @@ export default async function postsList(container) {
     <div class="max-w-5xl mx-auto p-6">
       <h1 class="text-2xl font-bold mb-4">សំណើសុំឈាមបន្ទាន់</h1>
       <div class="flex gap-3 mb-4">
-        <select id="provinceFilter" class="border p-2 rounded">
-          <option value="">ខេត្តទាំងអស់</option>
-          ${provinces.map((p) => `<option value="${p}">${p}</option>`).join("")}
-        </select>
-        <select id="bloodFilter" class="border p-2 rounded">
-          <option value="">ប្រភេទឈាមទាំងអស់</option>
-          ${bloodTypes.map((b) => `<option value="${b}">${b}</option>`).join("")}
-        </select>
+        <div class="relative">
+          <select id="provinceFilter" class="${selectClass}">
+            <option value="" class="text-neutral/40">ខេត្តទាំងអស់</option>
+            ${provinces.map((p) => `<option value="${p}">${p}</option>`).join("")}
+          </select>
+          <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+        </div>
+        <div class="relative">
+          <select id="bloodFilter" class="${selectClass}">
+            <option value="" class="text-neutral/40">ប្រភេទឈាមទាំងអស់</option>
+            ${bloodTypes.map((b) => `<option value="${b}">${b}</option>`).join("")}
+          </select>
+          <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+        </div>
       </div>
       <div id="list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </div>

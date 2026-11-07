@@ -2,6 +2,7 @@ import { getPostById } from "../services/posts.js";
 import { registerToPost, getRegistrantsByPost } from "../services/registrations.js";
 import { registrantList } from "../components/registrantList.js";
 import { icon } from "../utils/icons.js";
+import { btnPrimary, cardClass, chipClass, inputClass, selectClass } from "../utils/styles.js";
 
 export default async function postDetail(container, postId) {
   const idToken = localStorage.getItem("idToken");
@@ -22,17 +23,16 @@ export default async function postDetail(container, postId) {
   const isHospitalOwner = role === "hospital" && post.hospitalId === uid;
 
   container.innerHTML = `
-    <div class="max-w-2xl mx-auto p-6">
-      <div class="bg-white border border-neutral/20 rounded-lg p-6">
+    <div class="mx-auto max-w-2xl p-4 sm:p-6">
+      <div class="${cardClass} p-6 sm:p-8">
         <div class="flex justify-between items-start">
           <h1 class="font-headline text-xl font-bold text-neutral">${post.hospitalName}</h1>
-          <span class="px-2 py-1 text-xs rounded ${post.status === "active" ? "bg-secondary/10 text-secondary" : "bg-neutral/10 text-neutral/60"}">
+          <span class="${chipClass} ${post.status === "active" ? "bg-secondary/10 text-secondary" : "bg-neutral/10 text-neutral/60"}">
             ${post.status === "active" ? "Active" : "Fulfilled"}
           </span>
         </div>
-        <p class="text-3xl font-headline font-bold text-primary mt-2">${post.bloodType}</p>
-        <p class="text-sm text-neutral/70 mt-1">${post.unitsNeeded} units needed</p>
-        <p class="text-sm text-neutral/70">${post.province}</p>
+        <p class="mt-5 font-headline text-5xl font-bold text-primary">${post.bloodType}</p>
+        <p class="mt-2 text-sm text-neutral/70">${post.unitsNeeded} units needed · ${post.province}</p>
       </div>
 
       <div id="registerSection" class="mt-6"></div>
@@ -75,25 +75,28 @@ export default async function postDetail(container, postId) {
 
   section.innerHTML = `
     <h2 class="font-headline font-semibold text-neutral mb-3">Register as a Donor</h2>
-    <form id="regForm" class="space-y-3 bg-white border border-neutral/20 rounded-lg p-4">
+    <form id="regForm" class="${cardClass} space-y-3 p-5">
       <input type="text" name="name" placeholder="Full Name" required
-        class="w-full border border-neutral/20 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40" />
+        class="${inputClass}" />
       <input type="text" name="phone" placeholder="Phone Number" required
-        class="w-full border border-neutral/20 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40" />
+        class="${inputClass}" />
       <div class="flex gap-3">
         <input type="number" name="age" placeholder="Age" required
-          class="w-full border border-neutral/20 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40" />
+          class="${inputClass}" />
         <input type="number" name="weight" placeholder="Weight (kg)" required
-          class="w-full border border-neutral/20 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40" />
+          class="${inputClass}" />
       </div>
-      <select name="gender" required class="w-full border border-neutral/20 p-2 rounded-md">
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
+      <div class="relative">
+        <select name="gender" required class="${selectClass}">
+          <option value="" class="text-neutral/40">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+      </div>
       <input type="text" name="healthCondition" placeholder="Health Condition (if any)"
-        class="w-full border border-neutral/20 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40" />
-      <button type="submit" class="w-full bg-primary text-white font-medium py-2 rounded-md">Register</button>
+        class="${inputClass}" />
+      <button type="submit" class="${btnPrimary} w-full">Register</button>
       <p id="errorMsg" class="text-primary text-sm"></p>
       <p id="successMsg" class="text-secondary text-sm"></p>
     </form>

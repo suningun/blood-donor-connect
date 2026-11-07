@@ -1,4 +1,5 @@
 import { icon } from "../utils/icons.js";
+import { inputClass } from "../utils/styles.js";
 
 export const passwordField = ({
   name = "password",
@@ -8,7 +9,7 @@ export const passwordField = ({
   <div class="relative">
     <input type="password" name="${name}" placeholder="${placeholder}" required minlength="6"
       autocomplete="${autocomplete}"
-      class="w-full border border-neutral/20 p-2 pr-10 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40" />
+      class="${inputClass} pr-10" />
     <button type="button" data-toggle-password aria-label="Show password"
       class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral/50 hover:text-neutral">
       <span data-eye>${icon("Eye")}</span>

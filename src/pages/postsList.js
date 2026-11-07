@@ -2,9 +2,10 @@ import { getPosts } from "../services/posts.js";
 import { postCard } from "../components/postCard.js";
 import { icon } from "../utils/icons.js";
 import { PROVINCES } from "../data/provinces.js";
+import { cardClass, inputClass, selectClass, skeletonClass } from "../utils/styles.js";
 
 export default async function postsList(container) {
-  container.innerHTML = `<p class="p-6 text-neutral/60">Loading...</p>`;
+  container.innerHTML = `<div class="mx-auto max-w-6xl space-y-4 p-6"><div class="${skeletonClass} h-10 w-64"></div><div class="${skeletonClass} h-12"></div><div class="grid gap-4 md:grid-cols-3"><div class="${skeletonClass} h-44"></div><div class="${skeletonClass} h-44"></div><div class="${skeletonClass} h-44"></div></div></div>`;
 
   let posts = [];
   try {
@@ -23,19 +24,28 @@ export default async function postsList(container) {
   };
 
   container.innerHTML = `
-    <div class="max-w-5xl mx-auto p-6">
-      <h1 class="font-headline text-2xl font-bold mb-4 text-neutral flex items-center gap-2">${icon("Droplet", { color: "#D85A30" })} Urgent Blood Requests</h1>
-      <div class="flex gap-3 mb-4">
-        <select id="provinceFilter" class="border border-neutral/20 p-2 rounded-md">
-          <option value="">All Provinces</option>
-          ${PROVINCES.map((p) => `<option value="${p}">${p}</option>`).join("")}
-        </select>
-        <select id="bloodFilter" class="border border-neutral/20 p-2 rounded-md">
-          <option value="">All Blood Types</option>
-          ${bloodTypes.map((b) => `<option value="${b}">${b}</option>`).join("")}
-        </select>
+    <div class="mx-auto max-w-6xl p-4 sm:p-6">
+      <div class="mb-8">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-tertiary">Find an opportunity to help</p>
+        <h1 class="mt-2 flex items-center gap-2 font-headline text-3xl font-bold text-neutral">${icon("Droplet", { color: "#D85A30" })} Urgent Blood Requests</h1>
       </div>
-      <div id="list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      <div class="${cardClass} mb-6 flex flex-col gap-3 p-4 sm:flex-row">
+        <div class="relative md:w-48">
+          <select id="provinceFilter" class="${selectClass}">
+            <option value="" class="text-neutral/40">All Provinces</option>
+            ${PROVINCES.map((p) => `<option value="${p}">${p}</option>`).join("")}
+          </select>
+          <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+        </div>
+        <div class="relative md:w-48">
+          <select id="bloodFilter" class="${selectClass}">
+            <option value="" class="text-neutral/40">All Blood Types</option>
+            ${bloodTypes.map((b) => `<option value="${b}">${b}</option>`).join("")}
+          </select>
+          <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+        </div>
+      </div>
+      <div id="list" class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
     </div>
   `;
 

@@ -2,7 +2,7 @@ export const registrantList = (registrants) => `
   <div class="space-y-2">
     ${registrants.length
       ? registrants.map((r) => `
-        <div class="border border-neutral/20 p-3 rounded-md text-sm">
+        <div class="rounded-xl border border-neutral/10 bg-white p-4 text-sm shadow-sm">
           <p class="font-medium text-neutral">${r.name} — ${r.gender}, ${r.age}y, ${r.weight}kg</p>
           <p class="text-neutral/60">${r.phone}</p>
           <p class="text-neutral/60">Health: ${r.healthCondition || "None reported"}</p>
