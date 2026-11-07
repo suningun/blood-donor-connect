@@ -5,6 +5,7 @@ import { PROVINCES } from "../data/provinces.js";
 import { icon } from "../utils/icons.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
 
+
 export default async function hospitalDashboard(container) {
   const idToken = localStorage.getItem("idToken");
   const uid = localStorage.getItem("uid");
@@ -78,8 +79,9 @@ export default async function hospitalDashboard(container) {
     postList.querySelectorAll("[data-view]").forEach((btn) =>
       btn.addEventListener("click", async () => {
         const postId = btn.dataset.view;
-        const regs = await getRegistrantsByPost(postId, idToken);
+        const regs = await getRegistrantsByPost(postId, uid, idToken);
         const box = postList.querySelector(`[data-registrants="${postId}"]`);
+        
         box.classList.remove("hidden");
         box.innerHTML = regs.length
           ? regs.map((r) => `<p>${r.name} — ${r.phone} — ${r.gender}, ${r.age}y</p>`).join("")
