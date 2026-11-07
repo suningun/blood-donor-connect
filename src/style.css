@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #D85A30;
+  --color-secondary: #0F6E56;
+  --color-tertiary: #854F0B;
+  --color-neutral: #2C2C2A;
+
+  --font-headline: "Be Vietnam Pro", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-neutral);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-headline);
+}
