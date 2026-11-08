@@ -1,5 +1,7 @@
 import { icon } from "../utils/icons.js";
-import { expand, collapse, fadeIn } from "../utils/motion.js";
+import { expand, fadeIn } from "../utils/motion.js";
+
+let scrollBound = false; // CHANGE 2: outside renderHeader, top of file
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -10,6 +12,8 @@ const navLinks = [
 ];
 
 export const renderHeader = (container) => {
+  container.className = "sticky top-0 z-20"; // CHANGE 3: sticky on the wrapper
+
   const role = localStorage.getItem("role");
   const current = location.pathname;
 
@@ -26,14 +30,14 @@ export const renderHeader = (container) => {
       <a href="/hospital-login" data-link class="text-neutral/70 transition hover:text-primary">Hospital Login</a>
       <a href="/user-register" data-link class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95">Sign Up</a>`,
     user: `
-      <button id="logoutBtn" class="flex items-center gap-1 text-neutral/60 transition hover:text-primary">${icon("LogOut")} Logout</button>`,
+      <button data-logout class="flex items-center gap-1 text-neutral/60 transition hover:text-primary">${icon("LogOut")} Logout</button>`,
     hospital: `
       <a href="/hospital-dashboard" data-link class="flex items-center gap-1 text-neutral/70 transition hover:text-primary">${icon("Home")} Dashboard</a>
-      <button id="logoutBtn" class="flex items-center gap-1 text-neutral/60 transition hover:text-primary">${icon("LogOut")} Logout</button>`,
-  };
+      <button data-logout class="flex items-center gap-1 text-neutral/60 transition hover:text-primary">${icon("LogOut")} Logout</button>`,
+  }; // CHANGE 1: id="logoutBtn" became data-logout (both blocks)
 
   container.innerHTML = `
-    <header class="sticky top-0 z-20 border-b border-neutral/10 bg-white/80 backdrop-blur transition-shadow duration-200">
+    <header class="border-b border-neutral/10 bg-white/80 backdrop-blur transition-shadow duration-200">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <a href="/" data-link class="flex items-center gap-2 font-headline text-lg font-bold text-primary sm:text-xl">${icon("Droplet", { width: 22, height: 22 })} Blood Donor Connect</a>
         <details class="relative lg:hidden">
@@ -51,14 +55,17 @@ export const renderHeader = (container) => {
         </nav>
       </div>
     </header>
-  `;
+  `; // CHANGE 3: removed "sticky top-0 z-20" from <header>
 
-  container.querySelector("#logoutBtn")?.addEventListener("click", () => {
-    localStorage.clear();
-    window.location.href = "/";
-  });
+  // CHANGE 1: bind every logout button (mobile + desktop)
+  container.querySelectorAll("[data-logout]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "/";
+    })
+  );
 
-  const header = container.querySelector("header");
+  // mobile menu animation (collapse removed, it never showed)
   const menu = container.querySelector("details");
   const menuPanel = menu?.querySelector("nav");
   if (menu && menuPanel) {
@@ -66,12 +73,20 @@ export const renderHeader = (container) => {
       if (menu.open) {
         expand(menuPanel);
         fadeIn(menuPanel, { y: -4, duration: 180 });
-      } else {
-        collapse(menuPanel);
       }
     });
   }
-  const updateHeaderShadow = () => header?.classList.toggle("shadow-sm", window.scrollY > 8);
-  window.addEventListener("scroll", updateHeaderShadow, { passive: true });
-  updateHeaderShadow();
+
+  // CHANGE 2: scroll shadow, listener bound only once
+  const header = container.querySelector("header");
+  header?.classList.toggle("shadow-sm", window.scrollY > 8);
+
+  if (!scrollBound) {
+    window.addEventListener(
+      "scroll",
+      () => document.querySelector("#header header")?.classList.toggle("shadow-sm", window.scrollY > 8),
+      { passive: true }
+    );
+    scrollBound = true;
+  }
 };
