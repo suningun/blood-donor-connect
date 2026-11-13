@@ -12,8 +12,6 @@ const navLinks = [
 ];
 
 export const renderHeader = (container) => {
-  container.className = "sticky top-0 z-20"; // CHANGE 3: sticky on the wrapper
-
   const role = localStorage.getItem("role");
   const current = location.pathname;
 
