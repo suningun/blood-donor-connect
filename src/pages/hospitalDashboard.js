@@ -5,6 +5,7 @@ import { PROVINCES } from "../data/provinces.js";
 import { icon } from "../utils/icons.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
 import { fadeIn, fadeOut, setButtonLoading, spinner, staggerChildren } from "../utils/motion.js";
+// import { getHospital } from "../services/hospitals.js";
 
 
 export default async function hospitalDashboard(container) {
@@ -121,7 +122,7 @@ export default async function hospitalDashboard(container) {
     const submitButton = e.target.querySelector("button[type='submit']");
     setButtonLoading(submitButton, true, spinner(icon("Plus", { width: 16, height: 16 })));
     try {
-      await createPost({ ...data, unitsNeeded: Number(data.unitsNeeded), hospitalId: uid, hospitalName: "Hospital" }, idToken);
+      await createPost({ ...data, unitsNeeded: Number(data.unitsNeeded), hospitalId: uid, hospitalName: hospital.hospitalName }, idToken);
       e.target.reset();
       loadPosts();
     } finally {
