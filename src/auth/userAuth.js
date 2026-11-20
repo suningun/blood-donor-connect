@@ -1,7 +1,11 @@
 import { API_KEY, AUTH_BASE, DB_BASE } from "../firebase.js";
+import { assessEligibility } from "../data/eligibility.js";
 import { toFirestoreFields } from "../utils/firestoreUtils.js";
 
-export const registerUser = async ({ email, password, username, phone, province }) => {
+export const registerUser = async ({ email, password, username, phone, province, age, weight }) => {
+  const eligibilityErrors = assessEligibility({ age, weight });
+  if (eligibilityErrors.length) throw new Error(eligibilityErrors.join(" "));
+
   const res = await fetch(`${AUTH_BASE}/accounts:signUp?key=${API_KEY}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -15,7 +19,16 @@ export const registerUser = async ({ email, password, username, phone, province 
   await fetch(`${DB_BASE}/users/${localId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
-    body: JSON.stringify(toFirestoreFields({ username, phone, province, email })),
+    body: JSON.stringify(
+      toFirestoreFields({
+        username,
+        phone,
+        province,
+        email,
+        age: Number(age),
+        weight: Number(weight),
+      })
+    ),
   });
 
   localStorage.setItem("role", "user");

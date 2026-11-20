@@ -1,11 +1,22 @@
 import { icon } from "../utils/icons.js";
-import { cardClass } from "../utils/styles.js";
+import { btnOutline, btnPrimary, cardClass } from "../utils/styles.js";
 
-const team = [
-  { name: "Member One", role: "Frontend & UI" },
-  { name: "Member Two", role: "API Integration" },
-  { name: "Member Three", role: "Authentication" },
-  { name: "Member Four", role: "Testing & Docs" },
+const steps = [
+  {
+    icon: "UserPlus",
+    title: "Sign up",
+    text: "Create a donor account with your blood type, age, weight and province, or register your hospital.",
+  },
+  {
+    icon: "Search",
+    title: "Find a request",
+    text: "Browse urgent requests and filter them by province and blood type in seconds.",
+  },
+  {
+    icon: "Droplet",
+    title: "Register to donate",
+    text: "Sign up for a request, then show up at the hospital ready to help save a life.",
+  },
 ];
 
 export default function about(container) {
@@ -28,14 +39,33 @@ export default function about(container) {
       </section>
 
       <section>
-        <h2 class="font-headline text-xl font-semibold mb-3">The team</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          ${team.map((m) => `
-            <div class="${cardClass} p-5 text-center">
-              <div class="w-12 h-12 mx-auto rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center">${icon("User", { width: 22, height: 22 })}</div>
-              <p class="font-medium mt-2 text-sm">${m.name}</p>
-              <p class="text-xs text-neutral/60">${m.role}</p>
+        <h2 class="font-headline text-xl font-semibold mb-3">Our story</h2>
+        <div class="${cardClass} space-y-3 p-6">
+          <p class="text-sm leading-6 text-neutral/70">Blood Donor Connect began as a class project. Our team noticed that when a hospital runs low on a rare blood type, the call for help is usually a photo of a notice shared into a few Facebook groups. It reaches whoever happens to scroll past, then disappears down the feed.</p>
+          <p class="text-sm leading-6 text-neutral/70">We wanted to give those requests a permanent, searchable home. The result is a simple prototype where hospitals can publish what they need, and donors can find requests near them that match their blood type.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="font-headline text-xl font-semibold mb-3">How it works</h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          ${steps.map((step) => `
+            <div class="${cardClass} p-6">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">${icon(step.icon, { width: 20, height: 20 })}</span>
+              <h3 class="mt-3 font-headline font-semibold text-neutral">${step.title}</h3>
+              <p class="mt-1 text-sm leading-6 text-neutral/70">${step.text}</p>
             </div>`).join("")}
+        </div>
+      </section>
+
+      <section class="${cardClass} flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div>
+          <h2 class="font-headline text-xl font-semibold text-neutral">Ready to help?</h2>
+          <p class="mt-1 text-sm text-neutral/70">Join as a donor, or register your hospital and start posting requests.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href="/user-register" data-link class="${btnPrimary}">Become a donor</a>
+          <a href="/hospital-register" data-link class="${btnOutline}">Register your hospital</a>
         </div>
       </section>
 

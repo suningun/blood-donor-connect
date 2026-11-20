@@ -1,15 +1,8 @@
 import { BLOOD_TYPES, COMPATIBILITY } from "../data/bloodCompatibility.js";
+import { ELIGIBILITY } from "../data/eligibility.js";
 import { icon } from "../utils/icons.js";
 import { cardClass } from "../utils/styles.js";
 import { expand, collapse, staggerChildren } from "../utils/motion.js";
-
-const eligibility = [
-  "Generally aged 18–65 (rules vary by blood service)",
-  "Weigh at least 50 kg",
-  "In good general health on the day of donation",
-  "Not pregnant or recently ill",
-  "Wait about 3 months between whole-blood donations",
-];
 
 const tips = {
   Before: ["Eat a healthy meal", "Drink plenty of water", "Get a good night's sleep"],
@@ -36,7 +29,7 @@ export default function bloodInfo(container) {
       <section>
         <h2 class="font-headline text-xl font-semibold mb-3">Who can donate?</h2>
         <ul class="${cardClass} space-y-2 p-4 text-sm">
-          ${eligibility.map((e) => `<li class="flex items-start gap-2"><span class="text-secondary mt-0.5">${icon("Check")}</span>${e}</li>`).join("")}
+          ${ELIGIBILITY.map((e) => `<li class="flex items-start gap-2"><span class="text-secondary mt-0.5">${icon("Check")}</span>${e}</li>`).join("")}
         </ul>
         <p class="text-xs text-neutral/50 mt-2">General guidelines only. Always follow your local blood service's rules.</p>
       </section>
