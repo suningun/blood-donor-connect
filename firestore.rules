@@ -1,0 +1,91 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function userProfileExists(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function hospitalProfileExists(uid) {
+      return exists(/databases/$(database)/documents/hospitals/$(uid));
+    }
+
+    function isDonor() {
+      return signedIn()
+        && userProfileExists(request.auth.uid)
+        && !hospitalProfileExists(request.auth.uid);
+    }
+
+    function isHospital() {
+      return signedIn()
+        && hospitalProfileExists(request.auth.uid)
+        && !userProfileExists(request.auth.uid);
+    }
+
+    function activePostBelongsToHospital(postId, hospitalId) {
+      let postPath = /databases/$(database)/documents/posts/$(postId);
+      return exists(postPath)
+        && get(postPath).data.status == "active"
+        && get(postPath).data.hospitalId == hospitalId;
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && !hospitalProfileExists(uid);
+      allow delete: if false;
+    }
+
+    match /hospitals/{uid} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && !userProfileExists(uid);
+      allow delete: if false;
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isHospital() && request.resource.data.hospitalId == request.auth.uid;
+      allow update: if isHospital()
+        && resource.data.hospitalId == request.auth.uid
+        && request.resource.data.hospitalId == resource.data.hospitalId;
+      allow delete: if isHospital() && resource.data.hospitalId == request.auth.uid;
+    }
+
+    match /registrations/{registrationId} {
+      allow create: if isDonor()
+        && request.resource.data.userId == request.auth.uid
+        && registrationId == request.resource.data.postId + "_" + request.auth.uid
+        && activePostBelongsToHospital(
+          request.resource.data.postId,
+          request.resource.data.hospitalId
+        );
+      allow read: if (isDonor() && resource.data.userId == request.auth.uid)
+        || (isHospital() && resource.data.hospitalId == request.auth.uid);
+      allow update, delete: if false;
+    }
+
+    match /messages/{messageId} {
+      allow create: if request.resource.data.keys().hasAll(["name", "email", "message", "createdAt"])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10
+        && request.resource.data.message.size() <= 2000
+        && request.resource.data.createdAt is timestamp;
+      allow read, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

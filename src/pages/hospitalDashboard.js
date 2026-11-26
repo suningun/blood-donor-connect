@@ -24,6 +24,10 @@ export default async function hospitalDashboard(container) {
     container.innerHTML = `<p class="p-6 text-primary">${err.message}</p>`;
     return;
   }
+  if (!hospital) {
+    container.innerHTML = `<p class="p-6 text-primary">Hospital profile not found. Please sign in again.</p>`;
+    return;
+  }
   container.innerHTML = `
     <div class="mx-auto max-w-5xl p-4 sm:p-6">
       <div class="mb-8 flex items-end justify-between gap-4">

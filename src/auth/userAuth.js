@@ -1,6 +1,10 @@
 import { API_KEY, AUTH_BASE, DB_BASE } from "../firebase.js";
 import { assessEligibility } from "../data/eligibility.js";
 import { toFirestoreFields } from "../utils/firestoreUtils.js";
+import { verifyAccountRole } from "./accountRole.js";
+
+const errorMessage = async (res, fallback) =>
+  (await res.json().catch(() => ({})))?.error?.message ?? fallback;
 
 export const registerUser = async ({ email, password, username, phone, province, age, weight }) => {
   const eligibilityErrors = assessEligibility({ age, weight });
@@ -16,7 +20,7 @@ export const registerUser = async ({ email, password, username, phone, province,
 
   const { localId, idToken } = data;
 
-  await fetch(`${DB_BASE}/users/${localId}`, {
+  const profileRes = await fetch(`${DB_BASE}/users/${localId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
     body: JSON.stringify(
@@ -30,6 +34,11 @@ export const registerUser = async ({ email, password, username, phone, province,
       })
     ),
   });
+  if (!profileRes.ok) {
+    throw new Error(
+      `Your account was created, but the donor profile could not be saved: ${await errorMessage(profileRes, "Profile save failed")}`
+    );
+  }
 
   localStorage.setItem("role", "user");
   localStorage.setItem("idToken", idToken);
@@ -45,6 +54,8 @@ export const loginUser = async ({ email, password }) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message ?? "Login failed");
+
+  await verifyAccountRole(data.localId, data.idToken, "user");
 
   localStorage.setItem("role", "user");
   localStorage.setItem("idToken", data.idToken);
