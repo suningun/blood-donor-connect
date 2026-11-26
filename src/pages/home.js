@@ -1,6 +1,7 @@
 import { getPosts } from "../services/posts.js";
 import { postCard } from "../components/postCard.js";
 import { icon } from "../utils/icons.js";
+import { link } from "../utils/url.js";
 import { btnOutline, btnPrimary, cardClass, skeletonClass } from "../utils/styles.js";
 import { fadeIn, staggerChildren } from "../utils/motion.js";
 
@@ -22,8 +23,8 @@ export default async function home(container) {
           Hospitals across Cambodia post urgent blood requests. Donors find them in one place instead of scattered social media posts.
         </p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <a href="/posts" data-link class="${btnPrimary}">Browse Requests ${icon("Search", { width: 17, height: 17 })}</a>
-          <a href="/user-register" data-link class="${btnOutline}">Become a Donor</a>
+          <a href="${link("/posts")}" data-link class="${btnPrimary}">Browse Requests ${icon("Search", { width: 17, height: 17 })}</a>
+          <a href="${link("/user-register")}" data-link class="${btnOutline}">Become a Donor</a>
         </div>
         <p id="stat" class="mt-8 text-sm text-neutral/60"></p>
       </div>
@@ -44,7 +45,7 @@ export default async function home(container) {
     <section class="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
       <div class="mb-5 flex items-center justify-between gap-4">
         <h2 class="font-headline text-2xl font-bold">Latest urgent requests</h2>
-        <a href="/posts" data-link class="text-tertiary text-sm font-medium">View all →</a>
+        <a href="${link("/posts")}" data-link class="text-tertiary text-sm font-medium">View all →</a>
       </div>
       <div id="latest" class="grid grid-cols-1 gap-4 md:grid-cols-3"><div class="${skeletonClass} h-40"></div><div class="${skeletonClass} h-40"></div><div class="${skeletonClass} h-40"></div></div>
     </section>
@@ -53,7 +54,7 @@ export default async function home(container) {
       <div class="rounded-2xl bg-secondary p-8 text-center text-white shadow-sm md:p-10">
         <h2 class="font-headline text-xl font-bold">Are you a hospital?</h2>
         <p class="text-white/80 text-sm mt-1">Create an account and post a blood request in minutes.</p>
-        <a href="/hospital-register" data-link class="mt-5 inline-flex rounded-xl bg-white px-5 py-2.5 font-semibold text-secondary transition hover:bg-white/90">Post a Request</a>
+        <a href="${link("/hospital-register")}" data-link class="mt-5 inline-flex rounded-xl bg-white px-5 py-2.5 font-semibold text-secondary transition hover:bg-white/90">Post a Request</a>
       </div>
     </section>
   `;

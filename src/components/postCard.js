@@ -1,5 +1,6 @@
 import { icon } from "../utils/icons.js";
 import { cardClass, chipClass } from "../utils/styles.js";
+import { link } from "../utils/url.js";
 
 export const postCard = (post) => `
     <article class="${cardClass} group p-5 transition duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
@@ -17,6 +18,6 @@ export const postCard = (post) => `
           <span>${post.unitsNeeded} units needed</span>
         </div>
         <p class="mt-1 text-sm text-neutral/55">${post.province}</p>
-        <a href="/post/${post.id}" data-link class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-tertiary transition group-hover:gap-2">View Details <span aria-hidden="true">→</span></a>
+        <a href="${link(`/post/${post.id}`)}" data-link class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-tertiary transition group-hover:gap-2">View Details <span aria-hidden="true">→</span></a>
     </article>
 `;

@@ -1,5 +1,6 @@
 import { icon } from "../utils/icons.js";
 import { btnOutline, btnPrimary, cardClass } from "../utils/styles.js";
+import { link } from "../utils/url.js";
 
 const steps = [
   {
@@ -64,8 +65,8 @@ export default function about(container) {
           <p class="mt-1 text-sm text-neutral/70">Join as a donor, or register your hospital and start posting requests.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <a href="/user-register" data-link class="${btnPrimary}">Become a donor</a>
-          <a href="/hospital-register" data-link class="${btnOutline}">Register your hospital</a>
+          <a href="${link("/user-register")}" data-link class="${btnPrimary}">Become a donor</a>
+          <a href="${link("/hospital-register")}" data-link class="${btnOutline}">Register your hospital</a>
         </div>
       </section>
 

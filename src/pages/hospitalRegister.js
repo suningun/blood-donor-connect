@@ -6,6 +6,7 @@ import { passwordsMatch } from "../utils/validation.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
 import { icon } from "../utils/icons.js";
 import { fadeIn, setButtonLoading, shake, spinner } from "../utils/motion.js";
+import { link } from "../utils/url.js";
 
 export default function hospitalRegister(container) {
   container.innerHTML = `
@@ -33,7 +34,7 @@ export default function hospitalRegister(container) {
         <button type="submit" class="${btnPrimary} w-full">Sign Up</button>
         <p id="errorMsg" class="text-primary text-sm"></p>
       </form>
-      <p class="mt-3 text-sm text-neutral/70">Already have an account? <a href="/hospital-login" data-link class="text-tertiary font-medium">Login</a></p>
+      <p class="mt-3 text-sm text-neutral/70">Already have an account? <a href="${link("/hospital-login")}" data-link class="text-tertiary font-medium">Login</a></p>
       </div>
     </div>
   `;

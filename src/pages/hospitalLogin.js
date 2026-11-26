@@ -3,6 +3,7 @@ import { navigate } from "../router.js";
 import { btnPrimary, cardClass, inputClass } from "../utils/styles.js";
 import { fadeIn, setButtonLoading, shake, spinner } from "../utils/motion.js";
 import { icon } from "../utils/icons.js";
+import { link } from "../utils/url.js";
 
 export default function hospitalLogin(container) {
   container.innerHTML = `
@@ -22,7 +23,7 @@ export default function hospitalLogin(container) {
         <button type="submit" class="${btnPrimary} w-full">Login</button>
         <p id="errorMsg" class="text-primary text-sm"></p>
       </form>
-      <p class="mt-3 text-sm text-neutral/70">Don't have an account? <a href="/hospital-register" data-link class="text-tertiary font-medium">Sign Up</a></p>
+      <p class="mt-3 text-sm text-neutral/70">Don't have an account? <a href="${link("/hospital-register")}" data-link class="text-tertiary font-medium">Sign Up</a></p>
       </div>
     </div>
   `;

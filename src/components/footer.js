@@ -1,3 +1,5 @@
+import { link } from "../utils/url.js";
+
 export const renderFooter = (container) => {
   container.innerHTML = `
     <footer class="mt-16 border-t border-neutral/10 bg-white">
@@ -9,9 +11,9 @@ export const renderFooter = (container) => {
         <div>
           <p class="text-sm font-semibold text-neutral">Explore</p>
           <div class="mt-3 flex flex-col gap-2 text-sm text-neutral/60">
-            <a href="/" data-link class="transition hover:text-primary">Home</a>
-            <a href="/posts" data-link class="transition hover:text-primary">Requests</a>
-            <a href="/blood-info" data-link class="transition hover:text-primary">Donation Info</a>
+            <a href="${link("/")}" data-link class="transition hover:text-primary">Home</a>
+            <a href="${link("/posts")}" data-link class="transition hover:text-primary">Requests</a>
+            <a href="${link("/blood-info")}" data-link class="transition hover:text-primary">Donation Info</a>
           </div>
         </div>
         <div>

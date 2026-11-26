@@ -1,5 +1,6 @@
 import { renderHeader } from "./components/header.js";
 import { renderFooter } from "./components/footer.js";
+import { currentPath, link, stripBase } from "./utils/url.js";
 
 let renderId = 0;
 
@@ -17,17 +18,17 @@ const routes = {
 };
 
 export const navigate = async (path) => {
-  history.pushState({}, "", path);
+  history.pushState({}, "", link(path));
   await render(path);
 };
 
-window.addEventListener("popstate", () => render(location.pathname));
+window.addEventListener("popstate", () => render(currentPath()));
 
 document.addEventListener("click", (e) => {
-  const link = e.target.closest("[data-link]");
-  if (!link) return;
+  const anchor = e.target.closest("[data-link]");
+  if (!anchor) return;
   e.preventDefault();
-  navigate(link.getAttribute("href"));
+  navigate(stripBase(anchor.getAttribute("href")));
 });
 
 export const render = async (path) => {
@@ -63,7 +64,7 @@ export const render = async (path) => {
         { opacity: 0, transform: "translateY(8px)" },
         { opacity: 1, transform: "none" },
       ],
-      { duration: 300, easing: "ease-out" }
+      { duration: 300, easing: "ease-out" },
     );
   }
 };

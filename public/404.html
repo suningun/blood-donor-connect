@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Blood Donor Connect</title>
+  </head>
+  <body>
+    <script>
+      // GitHub Pages serves this file for unknown paths. Store the intended
+      // route, then hand control back to the SPA at its base URL.
+      sessionStorage.setItem("spa-redirect", location.pathname + location.search);
+      location.replace("/blood-donor-connect/");
+    </script>
+  </body>
+</html>

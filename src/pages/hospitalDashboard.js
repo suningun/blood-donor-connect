@@ -3,6 +3,7 @@ import { getHospital } from "../services/hospitals.js";
 import { getRegistrantsByPost } from "../services/registrations.js";
 import { PROVINCES } from "../data/provinces.js";
 import { icon } from "../utils/icons.js";
+import { link } from "../utils/url.js";
 import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
 import { fadeIn, fadeOut, setButtonLoading, spinner, staggerChildren } from "../utils/motion.js";
 // import { getHospital } from "../services/hospitals.js";
@@ -14,7 +15,7 @@ export default async function hospitalDashboard(container) {
   const role = localStorage.getItem("role");
 
   if (!idToken || role !== "hospital") {
-    container.innerHTML = `<p class="p-6 text-neutral/60">Please <a href="/hospital-login" data-link class="text-tertiary font-medium">login</a> as a hospital.</p>`;
+    container.innerHTML = `<p class="p-6 text-neutral/60">Please <a href="${link("/hospital-login")}" data-link class="text-tertiary font-medium">login</a> as a hospital.</p>`;
     return;
   }
   let hospital;

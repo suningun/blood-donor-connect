@@ -63,6 +63,21 @@ src/
   utils/           icons, validation, Firestore field mapping
 ```
 
+## Deployment (GitHub Pages)
+
+The site deploys to `https://<user>.github.io/blood-donor-connect/` via GitHub Actions (`.github/workflows/deploy.yml`).
+
+1. Add the Web3Forms key as a repository secret: **Settings → Secrets and variables → Actions → `EMAIL_PUBLIC_KEY`**.
+2. **Settings → Pages → Source: GitHub Actions**.
+3. Push to `main`. The workflow builds and publishes `dist/`.
+4. Add `<user>.github.io` to Firebase Authentication → Settings → Authorized domains.
+
+Notes:
+
+- `vite.config.js` uses the `/blood-donor-connect/` base for production builds and `/` for local dev.
+- `src/utils/url.js` centralises `link()` / `stripBase()` so router links work under the Pages subpath.
+- `public/404.html` restores deep links such as `/posts` after a refresh.
+
 ## Notes
 
 - Firebase config lives in `src/firebase.js` and is committed for the prototype. Move it to environment variables before any real deployment and restrict the API key in the Firebase console.

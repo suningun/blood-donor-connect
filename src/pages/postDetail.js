@@ -2,6 +2,7 @@ import { getPostById } from "../services/posts.js";
 import { registerToPost, getRegistrantsByPost } from "../services/registrations.js";
 import { registrantList } from "../components/registrantList.js";
 import { icon } from "../utils/icons.js";
+import { link } from "../utils/url.js";
 import { btnPrimary, cardClass, chipClass, inputClass, selectClass } from "../utils/styles.js";
 import { fadeIn, setButtonLoading, shake, spinner, staggerChildren } from "../utils/motion.js";
 
@@ -73,8 +74,8 @@ export default async function postDetail(container, postId) {
   if (!idToken) {
     section.innerHTML = `
       <div class="${cardClass} p-5 text-sm text-neutral/70">
-        Please <a href="/user-login" data-link class="font-medium text-tertiary">log in</a>
-        or <a href="/user-register" data-link class="font-medium text-tertiary">sign up</a>
+        Please <a href="${link("/user-login")}" data-link class="font-medium text-tertiary">log in</a>
+        or <a href="${link("/user-register")}" data-link class="font-medium text-tertiary">sign up</a>
         as a donor to register for this request.
       </div>
     `;
