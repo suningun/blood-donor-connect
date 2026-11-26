@@ -3,4 +3,5 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
     plugins: [tailwindcss()],
+    envPrefix: ["VITE_", "EMAIL_PUBLIC_KEY"],
 });
