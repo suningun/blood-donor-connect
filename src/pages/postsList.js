@@ -19,14 +19,6 @@ export default async function postsList(container) {
 
   const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
-  const renderList = (list) => {
-    const listElement = container.querySelector("#list");
-    fadeSwap(listElement, () => {
-      listElement.innerHTML = list.length ? list.map(postCard).join("") : `<p class="text-neutral/50">No requests found.</p>`;
-      staggerChildren(listElement);
-    });
-  };
-
   container.innerHTML = `
     <div class="mx-auto max-w-6xl p-4 sm:p-6">
       <div class="mb-8">
@@ -53,15 +45,28 @@ export default async function postsList(container) {
     </div>
   `;
 
+  // The router mounts pages from a detached element, so hold direct references
+  // to the nodes used after mount instead of querying the container later.
+  const listElement = container.querySelector("#list");
+  const provinceFilter = container.querySelector("#provinceFilter");
+  const bloodFilter = container.querySelector("#bloodFilter");
+
+  const renderList = (list) => {
+    fadeSwap(listElement, () => {
+      listElement.innerHTML = list.length ? list.map(postCard).join("") : `<p class="text-neutral/50">No requests found.</p>`;
+      staggerChildren(listElement);
+    });
+  };
+
   renderList(posts);
   fadeIn(container.querySelector(".mx-auto"), { y: 8 });
 
-  container.querySelector("#provinceFilter").addEventListener("change", applyFilters);
-  container.querySelector("#bloodFilter").addEventListener("change", applyFilters);
+  provinceFilter.addEventListener("change", applyFilters);
+  bloodFilter.addEventListener("change", applyFilters);
 
   function applyFilters() {
-    const province = container.querySelector("#provinceFilter").value;
-    const bloodType = container.querySelector("#bloodFilter").value;
+    const province = provinceFilter.value;
+    const bloodType = bloodFilter.value;
     const filtered = posts.filter(
       (p) => (!province || p.province === province) && (!bloodType || p.bloodType === bloodType)
     );
