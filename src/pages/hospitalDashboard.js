@@ -4,10 +4,10 @@ import { getRegistrantsByPost } from "../services/registrations.js";
 import { PROVINCES } from "../data/provinces.js";
 import { icon } from "../utils/icons.js";
 import { link } from "../utils/url.js";
-import { btnPrimary, cardClass, inputClass, selectClass } from "../utils/styles.js";
+import { btnOutline, btnPrimary, cardClass, chipClass, inputClass, selectClass } from "../utils/styles.js";
 import { fadeIn, fadeOut, setButtonLoading, spinner, staggerChildren } from "../utils/motion.js";
-// import { getHospital } from "../services/hospitals.js";
 
+const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 export default async function hospitalDashboard(container) {
   const idToken = localStorage.getItem("idToken");
@@ -49,13 +49,14 @@ export default async function hospitalDashboard(container) {
         </div>
         <div class="relative">
           <select name="bloodType" required class="${selectClass}">
-            ${["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((b) => `<option>${b}</option>`).join("")}
+            ${BLOOD_TYPES.map((b) => `<option>${b}</option>`).join("")}
           </select>
           <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
         </div>
-        <input name="unitsNeeded" type="number" placeholder="Units Needed" required
+        <input name="unitsNeeded" type="number" min="1" step="1" placeholder="Units Needed" required
           class="${inputClass}" />
-        <button class="${btnPrimary} w-full sm:w-auto">Create Request</button>
+        <button type="submit" class="${btnPrimary} w-full sm:w-auto">Create Request</button>
+        <p id="createError" class="hidden text-sm text-primary"></p>
       </form>
 
       <div id="postList" class="space-y-3"></div>
@@ -63,77 +64,201 @@ export default async function hospitalDashboard(container) {
   `;
 
   const postList = container.querySelector("#postList");
+  const createForm = container.querySelector("#createForm");
+  const createError = container.querySelector("#createError");
+
+  const showError = (card, err) => {
+    const box = card?.querySelector("[data-error]");
+    if (!box) return;
+    box.textContent = err.message;
+    box.classList.remove("hidden");
+    fadeIn(box, { y: 4, duration: 180 });
+  };
+
+  const clearError = (card) => {
+    const box = card?.querySelector("[data-error]");
+    if (box) {
+      box.textContent = "";
+      box.classList.add("hidden");
+    }
+  };
 
   async function loadPosts() {
-    const posts = await getPostsByHospital(uid, idToken);
-    postList.innerHTML = posts.map((p) => `
-      <div class="${cardClass} p-4 transition duration-150 hover:shadow-md">
-        <div class="flex justify-between items-center">
+    let posts;
+    try {
+      posts = await getPostsByHospital(uid, idToken);
+    } catch (err) {
+      postList.innerHTML = `<p class="text-sm text-primary">${err.message}</p>`;
+      return;
+    }
+
+    postList.innerHTML = posts.map((p) => {
+      const active = p.status === "active";
+      return `
+      <div class="${cardClass} p-4 transition duration-150 hover:shadow-md" data-post="${p.id}">
+        <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p class="font-headline font-bold text-neutral">${p.bloodType} — ${p.unitsNeeded} units — ${p.province}</p>
-            <p class="text-sm text-neutral/50">${p.status}</p>
+            <span class="${chipClass} mt-2 ${active ? "bg-secondary/10 text-secondary" : "bg-neutral/10 text-neutral/60"}">${active ? "Active" : "Fulfilled"}</span>
           </div>
           <div class="flex flex-wrap gap-2 text-sm">
             <button data-view="${p.id}" class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-medium text-tertiary transition hover:bg-tertiary/10">${icon("User")} Registrants</button>
-            <button data-close="${p.id}" class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-medium text-secondary transition hover:bg-secondary/10">${icon("Pencil")} Close</button>
+            <button data-edit="${p.id}" class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-medium text-tertiary transition hover:bg-tertiary/10">${icon("Pencil")} Edit</button>
+            <button data-status="${p.id}" data-current="${p.status}" class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-medium text-secondary transition hover:bg-secondary/10">
+              ${icon("Check")} ${active ? "Close" : "Reopen"}
+            </button>
             <button data-delete="${p.id}" class="flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1.5 font-medium text-primary transition hover:bg-primary/20">${icon("Trash2")} Delete</button>
           </div>
         </div>
+
+        <form data-edit-form="${p.id}" class="mt-3 hidden grid gap-2 sm:grid-cols-[1fr_1fr_auto_auto]">
+          <div class="relative">
+            <select name="province" required class="${selectClass}">
+              ${PROVINCES.map((prov) => `<option value="${prov}" ${prov === p.province ? "selected" : ""}>${prov}</option>`).join("")}
+            </select>
+            <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+          </div>
+          <div class="relative">
+            <select name="bloodType" required class="${selectClass}">
+              ${BLOOD_TYPES.map((b) => `<option ${b === p.bloodType ? "selected" : ""}>${b}</option>`).join("")}
+            </select>
+            <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral/50">${icon("ChevronDown", { width: 16, height: 16 })}</span>
+          </div>
+          <input name="unitsNeeded" type="number" min="1" step="1" value="${p.unitsNeeded}" required aria-label="Units needed" class="${inputClass}" />
+          <div class="flex gap-2">
+            <button type="submit" class="${btnPrimary}">Save</button>
+            <button type="button" data-cancel class="${btnOutline}">Cancel</button>
+          </div>
+        </form>
+
         <div data-registrants="${p.id}" class="hidden mt-2 text-sm text-neutral/70"></div>
-      </div>
-    `).join("");
+        <p data-error class="mt-2 hidden text-sm text-primary"></p>
+      </div>`;
+    }).join("");
     staggerChildren(postList);
 
-    postList.querySelectorAll("[data-view]").forEach((btn) =>
-      btn.addEventListener("click", async () => {
-        const postId = btn.dataset.view;
+    postList.querySelectorAll("[data-post]").forEach((card) => {
+      const postId = card.dataset.post;
+
+      card.querySelector("[data-view]").addEventListener("click", async (e) => {
+        const btn = e.currentTarget;
         const originalLabel = btn.innerHTML;
+        clearError(card);
         setButtonLoading(btn, true, spinner(icon("User", { width: 16, height: 16 })));
-        const regs = await getRegistrantsByPost(postId, uid, idToken);
-        const box = postList.querySelector(`[data-registrants="${postId}"]`);
-        
-        box.classList.remove("hidden");
-        box.innerHTML = regs.length
-          ? regs.map((r) => `<p>${r.name} — ${r.phone} — ${r.gender}, ${r.age}y</p>`).join("")
-          : `<p>No registrants yet.</p>`;
-        btn.innerHTML = originalLabel;
-        setButtonLoading(btn, false);
-        fadeIn(box, { y: 4, duration: 180 });
-      })
-    );
+        try {
+          const regs = await getRegistrantsByPost(postId, uid, idToken);
+          const box = card.querySelector(`[data-registrants="${postId}"]`);
+          box.classList.remove("hidden");
+          box.innerHTML = regs.length
+            ? regs.map((r) => `<p>${r.name} — ${r.phone} — ${r.gender}, ${r.age}y</p>`).join("")
+            : `<p>No registrants yet.</p>`;
+          fadeIn(box, { y: 4, duration: 180 });
+        } catch (err) {
+          showError(card, err);
+        } finally {
+          btn.innerHTML = originalLabel;
+          setButtonLoading(btn, false);
+        }
+      });
 
-    postList.querySelectorAll("[data-close]").forEach((btn) =>
-      btn.addEventListener("click", async () => {
-        setButtonLoading(btn, true, spinner(icon("Pencil", { width: 16, height: 16 })));
-        await updatePost(btn.dataset.close, { status: "fulfilled" }, idToken);
-        loadPosts();
-      })
-    );
+      const editForm = card.querySelector(`[data-edit-form="${postId}"]`);
 
-    postList.querySelectorAll("[data-delete]").forEach((btn) =>
-      btn.addEventListener("click", async () => {
-        const card = btn.parentElement?.parentElement;
+      card.querySelector("[data-edit]").addEventListener("click", () => {
+        clearError(card);
+        editForm.classList.toggle("hidden");
+        if (!editForm.classList.contains("hidden")) fadeIn(editForm, { y: 4, duration: 160 });
+      });
+
+      editForm.querySelector("[data-cancel]").addEventListener("click", () => {
+        editForm.classList.add("hidden");
+      });
+
+      editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearError(card);
+        const saveButton = editForm.querySelector("button[type='submit']");
+        const data = Object.fromEntries(new FormData(editForm));
+        const units = Number(data.unitsNeeded);
+        if (!Number.isInteger(units) || units < 1) {
+          showError(card, new Error("Units needed must be a whole number of at least 1."));
+          return;
+        }
+
+        setButtonLoading(saveButton, true, spinner(icon("Check", { width: 16, height: 16 })));
+        try {
+          await updatePost(
+            postId,
+            { province: data.province, bloodType: data.bloodType, unitsNeeded: units },
+            idToken
+          );
+          await loadPosts();
+        } catch (err) {
+          showError(card, err);
+          setButtonLoading(saveButton, false);
+        }
+      });
+
+      card.querySelector("[data-status]").addEventListener("click", async (e) => {
+        const btn = e.currentTarget;
+        const nextStatus = btn.dataset.current === "active" ? "fulfilled" : "active";
+        clearError(card);
+        setButtonLoading(btn, true, spinner(icon("Check", { width: 16, height: 16 })));
+        try {
+          await updatePost(postId, { status: nextStatus }, idToken);
+          await loadPosts();
+        } catch (err) {
+          showError(card, err);
+          setButtonLoading(btn, false);
+        }
+      });
+
+      card.querySelector("[data-delete]").addEventListener("click", async (e) => {
+        const btn = e.currentTarget;
+        if (!window.confirm("Delete this request? This cannot be undone.")) return;
+        clearError(card);
         setButtonLoading(btn, true, spinner(icon("Trash2", { width: 16, height: 16 })));
-        await deletePost(btn.dataset.delete, idToken);
-        await fadeOut(card, { duration: 180 });
-        loadPosts();
-      })
-    );
+        try {
+          await deletePost(postId, idToken);
+          await fadeOut(card, { duration: 180 });
+          await loadPosts();
+        } catch (err) {
+          showError(card, err);
+          setButtonLoading(btn, false);
+        }
+      });
+    });
   }
 
-  container.querySelector("#createForm").addEventListener("submit", async (e) => {
+  createForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.target));
-    const submitButton = e.target.querySelector("button[type='submit']");
+    createError.classList.add("hidden");
+    createError.textContent = "";
+
+    const data = Object.fromEntries(new FormData(createForm));
+    const units = Number(data.unitsNeeded);
+    if (!Number.isInteger(units) || units < 1) {
+      createError.textContent = "Units needed must be a whole number of at least 1.";
+      createError.classList.remove("hidden");
+      return;
+    }
+
+    const submitButton = createForm.querySelector("button[type='submit']");
     setButtonLoading(submitButton, true, spinner(icon("Plus", { width: 16, height: 16 })));
     try {
-      await createPost({ ...data, unitsNeeded: Number(data.unitsNeeded), hospitalId: uid, hospitalName: hospital.hospitalName }, idToken);
-      e.target.reset();
-      loadPosts();
+      await createPost(
+        { ...data, unitsNeeded: units, hospitalId: uid, hospitalName: hospital.hospitalName },
+        idToken
+      );
+      createForm.reset();
+      await loadPosts();
+    } catch (err) {
+      createError.textContent = err.message;
+      createError.classList.remove("hidden");
+      fadeIn(createError, { y: 4, duration: 180 });
     } finally {
       setButtonLoading(submitButton, false);
     }
   });
 
-  loadPosts();
+  await loadPosts();
 }

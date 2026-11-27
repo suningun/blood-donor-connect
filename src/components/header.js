@@ -29,6 +29,7 @@ export const renderHeader = (container) => {
       <a href="${link("/hospital-login")}" data-link class="text-neutral/70 transition hover:text-primary">Hospital Login</a>
       <a href="${link("/user-register")}" data-link class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95">Sign Up</a>`,
     user: `
+      <span class="flex items-center gap-1 text-neutral/70">${icon("User")}<span data-username>Donor</span></span>
       <button data-logout class="flex items-center gap-1 text-neutral/60 transition hover:text-primary">${icon("LogOut")} Logout</button>`,
     hospital: `
       <a href="${link("/hospital-dashboard")}" data-link class="flex items-center gap-1 text-neutral/70 transition hover:text-primary">${icon("Home")} Dashboard</a>
@@ -57,6 +58,13 @@ export const renderHeader = (container) => {
   `; // CHANGE 3: removed "sticky top-0 z-20" from <header>
 
   // CHANGE 1: bind every logout button (mobile + desktop)
+  const username = localStorage.getItem("username");
+  if (username) {
+    container.querySelectorAll("[data-username]").forEach((el) => {
+      el.textContent = username;
+    });
+  }
+
   container.querySelectorAll("[data-logout]").forEach((btn) =>
     btn.addEventListener("click", () => {
       localStorage.clear();

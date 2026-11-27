@@ -1,6 +1,7 @@
 import { API_KEY, AUTH_BASE, DB_BASE } from "../firebase.js";
 import { assessEligibility } from "../data/eligibility.js";
 import { toFirestoreFields } from "../utils/firestoreUtils.js";
+import { getUser } from "../services/users.js";
 import { verifyAccountRole } from "./accountRole.js";
 
 const errorMessage = async (res, fallback) =>
@@ -43,6 +44,7 @@ export const registerUser = async ({ email, password, username, phone, province,
   localStorage.setItem("role", "user");
   localStorage.setItem("idToken", idToken);
   localStorage.setItem("uid", localId);
+  localStorage.setItem("username", username);
   return data;
 };
 
@@ -60,5 +62,14 @@ export const loginUser = async ({ email, password }) => {
   localStorage.setItem("role", "user");
   localStorage.setItem("idToken", data.idToken);
   localStorage.setItem("uid", data.localId);
+  localStorage.setItem("username", email.split("@")[0] || "Donor");
+
+  try {
+    const profile = await getUser(data.localId, data.idToken);
+    if (profile?.username) localStorage.setItem("username", profile.username);
+  } catch {
+    // Keep the email-based fallback if the profile cannot be loaded.
+  }
+
   return data;
 };
